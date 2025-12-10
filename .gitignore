@@ -1,0 +1,51 @@
+# 종속성 (Dependencies)
+node_modules/
+package-lock.json
+
+# 빌드 및 배포 출력 (Build and Deployment Output)
+/dist
+/build
+/out
+/coverage
+/public/build
+/public/dist
+
+# 로컬 개발 및 환경 설정 (Local Development and Environment Config)
+.env
+.env.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.DS_Store
+Thumbs.db
+
+# 로그 및 임시 파일 (Logs and Temp Files)
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.log
+.tmp
+.cache
+
+# 에디터 및 IDE 설정 (Editor and IDE Configuration)
+.idea
+.vscode
+*.sublime-project
+*.sublime-workspace
+
+# TypeScript 관련 (TypeScript Specific)
+*.tsbuildinfo
+
+# 기타 백업 및 스왑 파일
+*~
+#*#
+.bak
+.swp
+.swo
+.swp
+
+# Next.js, Gatsby 등 특정 프레임워크를 사용한다면 추가하세요 (Add if using specific frameworks like Next.js, Gatsby, etc.)
+# .next/ # Next.js의 빌드 폴더
+# /public/page-data # Gatsby 관련 파일
+# /cache # Gatsby 캐시

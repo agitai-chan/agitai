@@ -1,0 +1,429 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =====================================================
+// ENUMS
+// =====================================================
+enum WorkspaceRole {
+  Owner
+  Member
+}
+
+enum CourseRole {
+  Manager
+  Expert
+  Participant
+}
+
+enum TeamRole {
+  CEO
+  CPO
+  CMO
+  COO
+  CTO
+  CFO
+}
+
+enum TaskStatus {
+  Todo
+  Doing
+  Review
+  Done
+}
+
+enum TabType {
+  guide
+  prompt
+  product
+}
+
+enum ReviewAction {
+  approve
+  reject
+  request_revision
+}
+
+enum CourseType {
+  startup_basic
+  startup_advanced
+  ai_literacy
+  design_thinking
+  business_model
+  market_research
+  pitch_deck
+}
+
+// =====================================================
+// MODELS
+// =====================================================
+
+model User {
+  id              String    @id @default(uuid()) @db.Uuid
+  email           String    @unique
+  realName        String    @map("real_name")
+  nickName        String    @unique @map("nick_name")
+  profileImage    String?   @map("profile_image")
+  phoneNumber     String?   @map("phone_number")
+  isSystemAdmin   Boolean   @default(false) @map("is_system_admin")
+  loginAttempts   Int       @default(0) @map("login_attempts")
+  lockedUntil     DateTime? @map("locked_until")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  ownedWorkspaces      Workspace[]         @relation("WorkspaceOwner")
+  workspaceMemberships WorkspaceMember[]
+  managedCourses       Course[]            @relation("CourseManager")
+  courseMemberships    CourseMember[]
+  teamMemberships      TeamMember[]
+  prompts              Prompt[]
+  comments             Comment[]
+  editedGuides         Guide[]             @relation("GuideEditor")
+  editedProducts       Product[]           @relation("ProductEditor")
+  productVersions      ProductVersion[]
+
+  @@map("users")
+}
+
+model Workspace {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  description String?
+  logoImage   String?  @map("logo_image")
+  ownerId     String   @map("owner_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  owner   User              @relation("WorkspaceOwner", fields: [ownerId], references: [id])
+  members WorkspaceMember[]
+  courses Course[]
+  invites WorkspaceInvite[]
+
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String        @id @default(uuid()) @db.Uuid
+  workspaceId String        @map("workspace_id") @db.Uuid
+  userId      String        @map("user_id") @db.Uuid
+  role        WorkspaceRole @default(Member)
+  joinedAt    DateTime      @default(now()) @map("joined_at")
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@map("workspace_members")
+}
+
+model WorkspaceInvite {
+  id          String    @id @default(uuid()) @db.Uuid
+  workspaceId String    @map("workspace_id") @db.Uuid
+  token       String    @unique
+  maxUses     Int       @default(100) @map("max_uses")
+  usedCount   Int       @default(0) @map("used_count")
+  expiresAt   DateTime  @map("expires_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("workspace_invites")
+}
+
+model Course {
+  id          String     @id @default(uuid()) @db.Uuid
+  workspaceId String     @map("workspace_id") @db.Uuid
+  managerId   String     @map("manager_id") @db.Uuid
+  name        String
+  description String?
+  courseType  CourseType @map("course_type")
+  startDate   DateTime?  @map("start_date")
+  endDate     DateTime?  @map("end_date")
+  isActive    Boolean    @default(true) @map("is_active")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  // Relations
+  workspace Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  manager   User           @relation("CourseManager", fields: [managerId], references: [id])
+  members   CourseMember[]
+  modules   Module[]
+  teams     Team[]
+  invites   CourseInvite[]
+
+  @@map("courses")
+}
+
+model CourseMember {
+  id       String     @id @default(uuid()) @db.Uuid
+  courseId String     @map("course_id") @db.Uuid
+  userId   String     @map("user_id") @db.Uuid
+  role     CourseRole @default(Participant)
+  joinedAt DateTime   @default(now()) @map("joined_at")
+
+  // Relations
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, userId])
+  @@map("course_members")
+}
+
+model CourseInvite {
+  id        String     @id @default(uuid()) @db.Uuid
+  courseId  String     @map("course_id") @db.Uuid
+  token     String     @unique
+  role      CourseRole @default(Participant)
+  maxUses   Int        @default(100) @map("max_uses")
+  usedCount Int        @default(0) @map("used_count")
+  expiresAt DateTime   @map("expires_at")
+  createdAt DateTime   @default(now()) @map("created_at")
+
+  // Relations
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@map("course_invites")
+}
+
+model Module {
+  id          String   @id @default(uuid()) @db.Uuid
+  courseId    String   @map("course_id") @db.Uuid
+  name        String
+  description String?
+  orderIndex  Int      @default(0) @map("order_index")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  course    Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  tasks     Task[]
+  teamTasks TeamTask[]
+
+  @@index([courseId, orderIndex])
+  @@map("modules")
+}
+
+model Team {
+  id        String   @id @default(uuid()) @db.Uuid
+  courseId  String   @map("course_id") @db.Uuid
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  course    Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  members   TeamMember[]
+  teamTasks TeamTask[]
+
+  @@unique([courseId, name])
+  @@map("teams")
+}
+
+model TeamMember {
+  id       String   @id @default(uuid()) @db.Uuid
+  teamId   String   @map("team_id") @db.Uuid
+  userId   String   @map("user_id") @db.Uuid
+  role     TeamRole @default(CEO)
+  joinedAt DateTime @default(now()) @map("joined_at")
+
+  // Relations
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@map("team_members")
+}
+
+model Task {
+  id          String     @id @default(uuid()) @db.Uuid
+  moduleId    String     @map("module_id") @db.Uuid
+  name        String
+  description String?
+  status      TaskStatus @default(Todo)
+  orderIndex  Int        @default(0) @map("order_index")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  // Relations
+  module    Module     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  guide     Guide?
+  comments  Comment[]
+  teamTasks TeamTask[]
+
+  @@index([moduleId, orderIndex])
+  @@map("tasks")
+}
+
+model TeamTask {
+  id        String     @id @default(uuid()) @db.Uuid
+  taskId    String     @map("task_id") @db.Uuid
+  teamId    String     @map("team_id") @db.Uuid
+  moduleId  String     @map("module_id") @db.Uuid
+  status    TaskStatus @default(Todo)
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  // Relations
+  task     Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  team     Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  module   Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  guide    Guide?
+  prompts  Prompt[]
+  product  Product?
+  comments Comment[]
+
+  @@unique([taskId, teamId])
+  @@map("team_tasks")
+}
+
+model Guide {
+  id           String   @id @default(uuid()) @db.Uuid
+  taskId       String?  @unique @map("task_id") @db.Uuid
+  teamTaskId   String?  @unique @map("team_task_id") @db.Uuid
+  content      String?
+  lastEditorId String?  @map("last_editor_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  task        Task?             @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  teamTask    TeamTask?         @relation(fields: [teamTaskId], references: [id], onDelete: Cascade)
+  lastEditor  User?             @relation("GuideEditor", fields: [lastEditorId], references: [id])
+  attachments GuideAttachment[]
+
+  @@map("guides")
+}
+
+model GuideAttachment {
+  id        String   @id @default(uuid()) @db.Uuid
+  guideId   String   @map("guide_id") @db.Uuid
+  fileName  String   @map("file_name")
+  fileUrl   String   @map("file_url")
+  fileSize  Int      @map("file_size")
+  mimeType  String   @map("mime_type")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  guide Guide @relation(fields: [guideId], references: [id], onDelete: Cascade)
+
+  @@map("guide_attachments")
+}
+
+model Prompt {
+  id            String    @id @default(uuid()) @db.Uuid
+  teamTaskId    String    @map("team_task_id") @db.Uuid
+  userId        String    @map("user_id") @db.Uuid
+  promptText    String    @map("prompt_text")
+  aiResponse    String?   @map("ai_response")
+  aiModel       String    @default("gpt-4") @map("ai_model")
+  temperature   Float     @default(0.7)
+  maxTokens     Int       @default(2048) @map("max_tokens")
+  tokensUsed    Int?      @map("tokens_used")
+  executionTime Int?      @map("execution_time_ms")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  teamTask   TeamTask    @relation(fields: [teamTaskId], references: [id], onDelete: Cascade)
+  user       User        @relation(fields: [userId], references: [id])
+  aiFeedback AIFeedback?
+
+  @@index([teamTaskId, userId])
+  @@index([createdAt(sort: Desc)])
+  @@map("prompts")
+}
+
+model AIFeedback {
+  id               String   @id @default(uuid()) @db.Uuid
+  promptId         String   @unique @map("prompt_id") @db.Uuid
+  clarityScore     Int?     @map("clarity_score")
+  specificityScore Int?     @map("specificity_score")
+  contextScore     Int?     @map("context_score")
+  formatScore      Int?     @map("format_score")
+  piqScore         Int?     @map("piq_score")
+  strengths        String[] @default([])
+  improvements     String[] @default([])
+  aiComment        String?  @map("ai_comment")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  // Relations
+  prompt Prompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+
+  @@map("ai_feedbacks")
+}
+
+model Product {
+  id             String        @id @default(uuid()) @db.Uuid
+  teamTaskId     String        @unique @map("team_task_id") @db.Uuid
+  content        String?
+  currentVersion Int           @default(1) @map("current_version")
+  lastEditorId   String?       @map("last_editor_id") @db.Uuid
+  submittedAt    DateTime?     @map("submitted_at")
+  reviewedAt     DateTime?     @map("reviewed_at")
+  reviewAction   ReviewAction? @map("review_action")
+  reviewScore    Int?          @map("review_score")
+  reviewRank     Int?          @map("review_rank")
+  reviewFeedback String?       @map("review_feedback")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  teamTask   TeamTask         @relation(fields: [teamTaskId], references: [id], onDelete: Cascade)
+  lastEditor User?            @relation("ProductEditor", fields: [lastEditorId], references: [id])
+  versions   ProductVersion[]
+
+  @@map("products")
+}
+
+model ProductVersion {
+  id            String   @id @default(uuid()) @db.Uuid
+  productId     String   @map("product_id") @db.Uuid
+  versionNumber Int      @map("version_number")
+  content       String
+  versionMemo   String?  @map("version_memo")
+  editorId      String   @map("editor_id") @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  // Relations
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  editor  User    @relation(fields: [editorId], references: [id])
+
+  @@unique([productId, versionNumber])
+  @@map("product_versions")
+}
+
+model Comment {
+  id              String   @id @default(uuid()) @db.Uuid
+  taskId          String?  @map("task_id") @db.Uuid
+  teamTaskId      String?  @map("team_task_id") @db.Uuid
+  tabType         TabType  @map("tab_type")
+  promptUserId    String?  @map("prompt_user_id") @db.Uuid
+  authorId        String   @map("author_id") @db.Uuid
+  commentText     String   @map("comment_text")
+  parentCommentId String?  @map("parent_comment_id") @db.Uuid
+  mentionedUsers  String[] @default([]) @map("mentioned_users")
+  isEdited        Boolean  @default(false) @map("is_edited")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  task          Task?     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  teamTask      TeamTask? @relation(fields: [teamTaskId], references: [id], onDelete: Cascade)
+  author        User      @relation(fields: [authorId], references: [id])
+  parentComment Comment?  @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
+  replies       Comment[] @relation("CommentReplies")
+
+  @@index([taskId, tabType])
+  @@index([teamTaskId, tabType])
+  @@map("comments")
+}

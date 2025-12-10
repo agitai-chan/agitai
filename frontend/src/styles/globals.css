@@ -1,0 +1,154 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Pretendard 폰트 */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+/* Base Styles */
+@layer base {
+  * {
+    @apply border-slate-200;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-slate-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-slate-300;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-400;
+  }
+}
+
+/* Component Styles */
+@layer components {
+  /* Focus Ring */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+
+  /* Prose (for markdown content) */
+  .prose {
+    @apply text-slate-700;
+  }
+
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4,
+  .prose h5,
+  .prose h6 {
+    @apply font-semibold text-slate-900;
+  }
+
+  .prose h1 {
+    @apply text-2xl;
+  }
+
+  .prose h2 {
+    @apply text-xl;
+  }
+
+  .prose h3 {
+    @apply text-lg;
+  }
+
+  .prose p {
+    @apply my-4;
+  }
+
+  .prose ul,
+  .prose ol {
+    @apply my-4 ml-6;
+  }
+
+  .prose ul {
+    @apply list-disc;
+  }
+
+  .prose ol {
+    @apply list-decimal;
+  }
+
+  .prose li {
+    @apply my-1;
+  }
+
+  .prose code {
+    @apply rounded bg-slate-100 px-1.5 py-0.5 font-mono text-sm text-slate-800;
+  }
+
+  .prose pre {
+    @apply my-4 overflow-x-auto rounded-lg bg-slate-900 p-4;
+  }
+
+  .prose pre code {
+    @apply bg-transparent p-0 text-slate-100;
+  }
+
+  .prose blockquote {
+    @apply my-4 border-l-4 border-slate-300 pl-4 italic text-slate-600;
+  }
+
+  .prose a {
+    @apply text-primary-600 underline hover:text-primary-700;
+  }
+
+  .prose table {
+    @apply my-4 w-full border-collapse;
+  }
+
+  .prose th,
+  .prose td {
+    @apply border border-slate-300 px-3 py-2;
+  }
+
+  .prose th {
+    @apply bg-slate-100 font-semibold;
+  }
+}
+
+/* Utility Classes */
+@layer utilities {
+  /* Text ellipsis */
+  .text-ellipsis {
+    @apply overflow-hidden text-ellipsis whitespace-nowrap;
+  }
+
+  /* Line clamp */
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
