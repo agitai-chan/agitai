@@ -12,7 +12,6 @@ package-lock.json
 
 # 로컬 개발 및 환경 설정 (Local Development and Environment Config)
 .env
-.env.example
 .env.local
 .env.development.local
 .env.test.local
