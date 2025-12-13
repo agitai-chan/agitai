@@ -58,9 +58,31 @@ export class LoginDto {
 }
 
 export class GoogleLoginDto {
-  @ApiProperty()
+  @ApiProperty({ description: 'Google OAuth access token' })
   @IsString()
   google_token: string;
+}
+
+export class GoogleSignupCompleteDto {
+  @ApiProperty({ example: 'user@gmail.com', description: 'Google 계정 이메일' })
+  @IsEmail({}, { message: '올바른 이메일 형식이 아닙니다' })
+  email: string;
+
+  @ApiProperty({ example: '홍길동', minLength: 2, maxLength: 20 })
+  @IsString()
+  @MinLength(2, { message: '실명은 2자 이상이어야 합니다' })
+  @MaxLength(20, { message: '실명은 20자 이하여야 합니다' })
+  real_name: string;
+
+  @ApiProperty({ example: '길동이', minLength: 2, maxLength: 20 })
+  @IsString()
+  @MinLength(2, { message: '닉네임은 2자 이상이어야 합니다' })
+  @MaxLength(20, { message: '닉네임은 20자 이하여야 합니다' })
+  nick_name: string;
+
+  @ApiProperty({ example: true })
+  @IsBoolean()
+  terms_all_agree: boolean;
 }
 
 export class PasswordResetDto {

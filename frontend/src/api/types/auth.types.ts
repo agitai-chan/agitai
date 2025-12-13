@@ -35,15 +35,27 @@ export interface LoginResponse {
 }
 
 export interface GoogleLoginRequest {
-  id_token: string;
+  google_token: string;
 }
 
 export interface GoogleNewUserResponse {
-  temp_token: string;
+  is_new_user: boolean;
+  google_email: string;
+  redirect_url: string;
+}
+
+export interface GoogleSignupCompleteRequest {
   email: string;
-  google_id: string;
-  profile_image?: string;
-  requires_additional_info: boolean;
+  real_name: string;
+  nick_name: string;
+  terms_all_agree: boolean;
+}
+
+export interface GoogleSignupCompleteResponse {
+  user_id: string;
+  email: string;
+  message: string;
+  redirect_url: string;
 }
 
 export interface UserProfile {

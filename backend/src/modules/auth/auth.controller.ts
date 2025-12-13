@@ -6,6 +6,7 @@ import {
   SignupDto,
   LoginDto,
   GoogleLoginDto,
+  GoogleSignupCompleteDto,
   PasswordResetDto,
   SignupResponseDto,
   LoginResponseDto,
@@ -79,5 +80,19 @@ export class AuthController {
   @ApiResponse({ status: 429, description: '재발송 제한', type: ErrorResponseDto })
   async passwordReset(@Body() dto: PasswordResetDto): Promise<{ message: string }> {
     return this.authService.requestPasswordReset(dto);
+  }
+
+  @Post('google-signup-complete')
+  @Public()
+  @ApiOperation({
+    operationId: 'completeGoogleSignup',
+    summary: 'AGIT-US05 구글 회원가입 완료',
+    description: 'Google OAuth로 인증된 신규 사용자의 추가 정보 입력',
+  })
+  @ApiResponse({ status: 201, description: '회원가입 완료', type: SignupResponseDto })
+  @ApiResponse({ status: 400, description: '유효성 검증 실패', type: ValidationErrorResponseDto })
+  @ApiResponse({ status: 409, description: '이미 가입된 이메일/닉네임', type: ErrorResponseDto })
+  async googleSignupComplete(@Body() dto: GoogleSignupCompleteDto): Promise<SignupResponseDto> {
+    return this.authService.completeGoogleSignup(dto);
   }
 }
