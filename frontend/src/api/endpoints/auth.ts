@@ -6,6 +6,8 @@ import type {
   LoginResponse,
   GoogleLoginRequest,
   GoogleNewUserResponse,
+  GoogleSignupCompleteRequest,
+  GoogleSignupCompleteResponse,
   UserProfile,
   UpdateProfileRequest,
   MessageResponse,
@@ -42,6 +44,20 @@ export const googleLogin = async (
 ): Promise<LoginResponse | GoogleNewUserResponse> => {
   const response = await apiClient.post<LoginResponse | GoogleNewUserResponse>(
     '/user/google-login',
+    data
+  );
+  return response.data;
+};
+
+/**
+ * 구글 회원가입 완료 (추가 정보 입력)
+ * POST /user/google-signup-complete
+ */
+export const googleSignupComplete = async (
+  data: GoogleSignupCompleteRequest
+): Promise<GoogleSignupCompleteResponse> => {
+  const response = await apiClient.post<GoogleSignupCompleteResponse>(
+    '/user/google-signup-complete',
     data
   );
   return response.data;

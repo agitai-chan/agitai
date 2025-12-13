@@ -13,6 +13,7 @@ import {
   SignupDto,
   LoginDto,
   GoogleLoginDto,
+  GoogleSignupCompleteDto,
   PasswordResetDto,
   SignupResponseDto,
   LoginResponseDto,
@@ -238,6 +239,56 @@ export class AuthService {
 
     return {
       message: '비밀번호 재설정 이메일이 발송되었습니다',
+    };
+  }
+
+  async completeGoogleSignup(dto: GoogleSignupCompleteDto): Promise<SignupResponseDto> {
+    // Check terms agreement
+    if (!dto.terms_all_agree) {
+      throw new BadRequestException({
+        code: 'AUTH_002',
+        message: '이용약관에 동의해야 합니다',
+      });
+    }
+
+    // Check if email already exists
+    const existingUser = await this.prismaService.user.findUnique({
+      where: { email: dto.email },
+    });
+
+    if (existingUser) {
+      throw new ConflictException({
+        code: 'USER_001',
+        message: '이미 가입된 이메일입니다',
+      });
+    }
+
+    // Check if nickname already exists
+    const existingNickname = await this.prismaService.user.findUnique({
+      where: { nickName: dto.nick_name },
+    });
+
+    if (existingNickname) {
+      throw new ConflictException({
+        code: 'USER_002',
+        message: '이미 사용 중인 닉네임입니다',
+      });
+    }
+
+    // Create user in database (Supabase user already created during google-login)
+    const user = await this.prismaService.user.create({
+      data: {
+        email: dto.email,
+        realName: dto.real_name,
+        nickName: dto.nick_name,
+      },
+    });
+
+    return {
+      user_id: user.id,
+      email: user.email,
+      message: 'Google 계정으로 회원가입이 완료되었습니다.',
+      redirect_url: '/login',
     };
   }
 
