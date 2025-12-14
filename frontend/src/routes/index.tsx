@@ -6,6 +6,7 @@ import { ProtectedRoute } from './ProtectedRoute';
 // Auth Pages
 import { LoginPage } from '@/pages/auth/LoginPage';
 import { SignupPage } from '@/pages/auth/SignupPage';
+import { GoogleSignupCompletePage } from '@/pages/auth/GoogleSignupCompletePage';
 import { PasswordResetPage } from '@/pages/auth/PasswordResetPage';
 
 // Main Pages
@@ -37,6 +38,10 @@ export const router = createBrowserRouter([
       {
         path: '/signup',
         element: <SignupPage />,
+      },
+      {
+        path: '/signup/complete',
+        element: <GoogleSignupCompletePage />,
       },
       {
         path: '/password-reset',
