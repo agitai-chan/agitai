@@ -24,14 +24,23 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface LoginResponse {
+export interface UserProfileResponse {
   user_id: string;
   email: string;
+  real_name: string;
   nick_name: string;
   profile_image?: string;
+  phone_number?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface LoginResponse {
   access_token: string;
   refresh_token: string;
-  expires_at: string;
+  token_type: string;
+  expires_in: number;
+  user: UserProfileResponse;
 }
 
 export interface GoogleLoginRequest {

@@ -24,32 +24,33 @@ export function GoogleLoginButton({ onNewUser }: GoogleLoginButtonProps) {
     try {
       // Google ID token을 백엔드로 전송
       const response = await googleLogin({ google_token: credentialResponse.credential });
+      const result = response.data;
 
       // 신규 사용자인 경우
-      if ('is_new_user' in response && response.is_new_user) {
+      if ('is_new_user' in result && result.is_new_user) {
         if (onNewUser) {
-          onNewUser(response.google_email);
+          onNewUser(result.google_email);
         } else {
           // 세션 스토리지에 이메일 저장 후 추가 정보 입력 페이지로 이동
-          sessionStorage.setItem('google_signup_email', response.google_email);
+          sessionStorage.setItem('google_signup_email', result.google_email);
           navigate('/signup/complete');
         }
         return;
       }
 
       // 기존 사용자 로그인 성공
-      if ('access_token' in response) {
+      if ('access_token' in result) {
         storeLogin(
           {
-            user_id: response.user_id,
-            email: response.email,
-            nick_name: response.nick_name,
-            profile_image: response.profile_image,
+            user_id: result.user.user_id,
+            email: result.user.email,
+            nick_name: result.user.nick_name,
+            profile_image: result.user.profile_image,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
-          response.access_token,
-          response.refresh_token
+          result.access_token,
+          result.refresh_token
         );
         toast.success('로그인되었습니다');
         navigate('/');

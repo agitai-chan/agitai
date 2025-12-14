@@ -38,17 +38,18 @@ export function LoginPage() {
     setIsLoading(true);
     try {
       const response = await login(data);
+      const result = response.data;
       setAuth(
         {
-          user_id: response.user_id,
-          email: response.email,
-          nick_name: response.nick_name,
-          profile_image: response.profile_image,
-          created_at: '',
-          updated_at: '',
+          user_id: result.user.user_id,
+          email: result.user.email,
+          nick_name: result.user.nick_name,
+          profile_image: result.user.profile_image,
+          created_at: result.user.created_at,
+          updated_at: result.user.updated_at,
         },
-        response.access_token,
-        response.refresh_token
+        result.access_token,
+        result.refresh_token
       );
       toast.success('로그인되었습니다.');
       navigate(from, { replace: true });
