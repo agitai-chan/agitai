@@ -11,6 +11,7 @@ import type {
   UserProfile,
   UpdateProfileRequest,
   MessageResponse,
+  ApiResponse,
 } from '../types';
 
 // ==========================================
@@ -30,8 +31,8 @@ export const signup = async (data: SignupRequest): Promise<SignupResponse> => {
  * 이메일 로그인
  * POST /user/login
  */
-export const login = async (data: LoginRequest): Promise<LoginResponse> => {
-  const response = await apiClient.post<LoginResponse>('/user/login', data);
+export const login = async (data: LoginRequest): Promise<ApiResponse<LoginResponse>> => {
+  const response = await apiClient.post<ApiResponse<LoginResponse>>('/user/login', data);
   return response.data;
 };
 
@@ -41,8 +42,8 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
  */
 export const googleLogin = async (
   data: GoogleLoginRequest
-): Promise<LoginResponse | GoogleNewUserResponse> => {
-  const response = await apiClient.post<LoginResponse | GoogleNewUserResponse>(
+): Promise<ApiResponse<LoginResponse> | ApiResponse<GoogleNewUserResponse>> => {
+  const response = await apiClient.post<ApiResponse<LoginResponse> | ApiResponse<GoogleNewUserResponse>>(
     '/user/google-login',
     data
   );
