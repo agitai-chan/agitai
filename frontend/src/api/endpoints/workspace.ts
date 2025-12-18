@@ -8,16 +8,12 @@ import type {
 // Workspace API Endpoints
 // ==========================================
 
-export interface ListWorkspacesResponse {
-  workspaces: Workspace[];
-}
-
 export async function listWorkspaces(params?: {
   sort_by?: 'starred' | 'last_accessed' | 'created_at' | 'name';
   filter?: 'all' | 'owned' | 'joined';
   page?: number;
   limit?: number;
-}): Promise<ListWorkspacesResponse> {
+}): Promise<Workspace[]> {
   const { data } = await api.get('/workspaces', { params });
   return data;
 }
