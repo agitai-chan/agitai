@@ -53,7 +53,7 @@ export class WorkspacesController {
     return this.workspacesService.create(user.id, dto);
   }
 
-  @Get('list')
+  @Get()
   @ApiOperation({
     operationId: 'listWorkspaces',
     summary: 'AGIT-WS02 워크스페이스 목록',
