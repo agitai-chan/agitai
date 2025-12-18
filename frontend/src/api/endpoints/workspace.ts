@@ -15,7 +15,7 @@ export async function listWorkspaces(params?: {
   limit?: number;
 }): Promise<Workspace[]> {
   const { data } = await api.get('/workspaces', { params });
-  return data;
+  return data.data;
 }
 
 export async function getWorkspace(workspaceId: string): Promise<Workspace> {
