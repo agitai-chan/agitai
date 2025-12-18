@@ -81,6 +81,7 @@ export class SupabaseAuthGuard implements CanActivate {
       if (error instanceof UnauthorizedException) {
         throw error;
       }
+      console.error('[SupabaseAuthGuard] 인증 에러:', error);
       throw new UnauthorizedException('인증에 실패했습니다');
     }
   }
