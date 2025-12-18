@@ -23,11 +23,13 @@ type GoogleSignupFormData = z.infer<typeof googleSignupSchema>;
 export function GoogleSignupCompletePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [googleEmail, setGoogleEmail] = useState<string | null>(null);
+  const [googleNickname, setGoogleNickname] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<GoogleSignupFormData>({
     resolver: zodResolver(googleSignupSchema),
@@ -39,13 +41,18 @@ export function GoogleSignupCompletePage() {
 
   useEffect(() => {
     const email = sessionStorage.getItem('google_signup_email');
+    const nickname = sessionStorage.getItem('google_signup_nickname');
     if (!email) {
       toast.error('Google 인증 정보가 없습니다. 다시 로그인해주세요.');
       navigate('/login');
       return;
     }
     setGoogleEmail(email);
-  }, [navigate]);
+    if (nickname) {
+      setGoogleNickname(nickname);
+      setValue('nick_name', nickname);
+    }
+  }, [navigate, setValue]);
 
   const onSubmit = async (data: GoogleSignupFormData) => {
     if (!googleEmail) {
@@ -65,6 +72,7 @@ export function GoogleSignupCompletePage() {
 
       // 세션 스토리지 정리
       sessionStorage.removeItem('google_signup_email');
+      sessionStorage.removeItem('google_signup_nickname');
 
       toast.success('회원가입이 완료되었습니다. 다시 로그인해주세요.');
       navigate('/login', { replace: true });
