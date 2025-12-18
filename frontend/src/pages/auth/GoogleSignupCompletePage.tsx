@@ -119,15 +119,22 @@ export function GoogleSignupCompletePage() {
         </div>
 
         {/* 닉네임 */}
-        <div className="relative">
-          <User className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-          <Input
-            type="text"
-            placeholder="닉네임"
-            className="pl-10"
-            {...register('nick_name')}
-            error={errors.nick_name?.message}
-          />
+        <div>
+          <div className="relative">
+            <User className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+            <Input
+              type="text"
+              placeholder="닉네임"
+              className="pl-10"
+              {...register('nick_name')}
+              error={errors.nick_name?.message}
+            />
+          </div>
+          {googleNickname && (
+            <p className="mt-1 text-xs text-slate-500">
+              Google 계정에서 가져온 닉네임입니다. 원하시면 수정할 수 있습니다.
+            </p>
+          )}
         </div>
 
         {/* 약관 동의 */}
