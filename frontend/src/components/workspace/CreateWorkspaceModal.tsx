@@ -10,9 +10,8 @@ import { queryKeys } from '@/lib/queryClient';
 import toast from 'react-hot-toast';
 
 const createSchema = z.object({
-  workspace_name: z.string().min(1, '워크스페이스 이름을 입력해주세요.'),
+  name: z.string().min(1, '워크스페이스 이름을 입력해주세요.'),
   description: z.string().optional(),
-  workspace_color: z.string().optional(),
 });
 
 type CreateFormData = z.infer<typeof createSchema>;
@@ -45,9 +44,7 @@ export function CreateWorkspaceModal({ isOpen, onClose }: CreateWorkspaceModalPr
     formState: { errors },
   } = useForm<CreateFormData>({
     resolver: zodResolver(createSchema),
-    defaultValues: {
-      workspace_color: COLORS[0],
-    },
+    defaultValues: {},
   });
 
   const createMutation = useMutation({
@@ -81,15 +78,15 @@ export function CreateWorkspaceModal({ isOpen, onClose }: CreateWorkspaceModalPr
         </div>
         <form
           onSubmit={handleSubmit((data) =>
-            createMutation.mutate({ ...data, workspace_color: selectedColor })
+            createMutation.mutate(data)
           )}
         >
           <div className="space-y-4 p-6">
             <Input
               label="워크스페이스 이름"
               placeholder="예: 스타트업 부트캠프"
-              error={errors.workspace_name?.message}
-              {...register('workspace_name')}
+              error={errors.name?.message}
+              {...register('name')}
             />
 
             <div>

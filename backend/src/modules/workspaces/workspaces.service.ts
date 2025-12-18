@@ -80,7 +80,7 @@ export class WorkspacesService {
       },
     });
 
-    return memberships.map((m) => this.toWorkspaceResponse(m.workspace, m.role));
+    return memberships.map((m: { workspace: any; role: string }) => this.toWorkspaceResponse(m.workspace, m.role));
   }
 
   async findOne(workspaceId: string, userId: string): Promise<WorkspaceResponseDto> {

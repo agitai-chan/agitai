@@ -28,9 +28,8 @@ export async function getWorkspace(workspaceId: string): Promise<Workspace> {
 }
 
 export interface CreateWorkspaceRequest {
-  workspace_name: string;
+  name: string;
   description?: string;
-  workspace_color?: string;
 }
 
 export async function createWorkspace(payload: CreateWorkspaceRequest): Promise<Workspace> {
