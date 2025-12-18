@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search, Star, Users, BookOpen, MoreHorizontal, Settings, Trash2 } from 'lucide-react';
-import { Button, Input, Badge, Card } from '@/components/ui';
+import { Button, Input, Badge, Card, CardContent } from '@/components/ui';
 import { CreateWorkspaceModal } from '@/components/workspace/CreateWorkspaceModal';
 import { listWorkspaces, toggleWorkspaceStar, deleteWorkspace } from '@/api/endpoints/workspace';
 import { queryKeys } from '@/lib/queryClient';
@@ -176,7 +176,7 @@ function WorkspaceCard({ workspace, menuOpen, onMenuToggle, onStar, onDelete }: 
   return (
     <Card className="group relative transition-shadow hover:shadow-md">
       <Link to={`/workspace/${workspace.workspace_id}`}>
-        <Card.Content className="p-4">
+        <CardContent className="p-4">
           {/* Header */}
           <div className="mb-3 flex items-start justify-between">
             <div
@@ -207,7 +207,7 @@ function WorkspaceCard({ workspace, menuOpen, onMenuToggle, onStar, onDelete }: 
               {workspace.course_count}개 코스
             </span>
           </div>
-        </Card.Content>
+        </CardContent>
       </Link>
 
       {/* Actions */}
