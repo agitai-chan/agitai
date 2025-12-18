@@ -156,5 +156,8 @@ export class GoogleNewUserResponseDto {
   google_email: string;
 
   @ApiProperty()
+  nickname: string;
+
+  @ApiProperty()
   redirect_url: string;
 }

@@ -33,11 +33,11 @@ import { ErrorResponseDto } from '../../common/dto/api-response.dto';
 @ApiTags('Workspace')
 @ApiBearerAuth()
 @UseGuards(SupabaseAuthGuard)
-@Controller('workspace')
+@Controller('workspaces')
 export class WorkspacesController {
   constructor(private readonly workspacesService: WorkspacesService) {}
 
-  @Post('create')
+  @Post('/')
   @ApiOperation({
     operationId: 'createWorkspace',
     summary: 'AGIT-WS01 워크스페이스 생성',

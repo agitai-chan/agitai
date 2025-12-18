@@ -24,7 +24,7 @@ import { ErrorResponseDto, ValidationErrorResponseDto } from '../../common/dto/a
 @ApiTags('User')
 @ApiBearerAuth()
 @UseGuards(SupabaseAuthGuard)
-@Controller('user')
+@Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

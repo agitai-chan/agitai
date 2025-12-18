@@ -50,6 +50,7 @@ export interface GoogleLoginRequest {
 export interface GoogleNewUserResponse {
   is_new_user: boolean;
   google_email: string;
+  nickname: string;
   redirect_url: string;
 }
 

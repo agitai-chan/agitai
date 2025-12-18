@@ -18,6 +18,7 @@ import {
   SignupResponseDto,
   LoginResponseDto,
   UserProfileDto,
+  GoogleNewUserResponseDto
 } from './dto/auth.dto';
 
 @Injectable()
@@ -170,7 +171,7 @@ export class AuthService {
     };
   }
 
-  async loginWithGoogle(dto: GoogleLoginDto): Promise<LoginResponseDto | { is_new_user: boolean; google_email: string; redirect_url: string }> {
+  async loginWithGoogle(dto: GoogleLoginDto): Promise<LoginResponseDto | GoogleNewUserResponseDto> {
     const { data: supabaseData, error: supabaseError } =
       await this.supabaseService.signInWithGoogle(dto.google_token);
 
@@ -199,6 +200,7 @@ export class AuthService {
       return {
         is_new_user: true,
         google_email: googleEmail,
+        nickname: supabaseData.user?.user_metadata.name,
         redirect_url: '/signup/complete',
       };
     }

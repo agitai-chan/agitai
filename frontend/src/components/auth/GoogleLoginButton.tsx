@@ -33,6 +33,7 @@ export function GoogleLoginButton({ onNewUser }: GoogleLoginButtonProps) {
         } else {
           // 세션 스토리지에 이메일 저장 후 추가 정보 입력 페이지로 이동
           sessionStorage.setItem('google_signup_email', result.google_email);
+          sessionStorage.setItem('google_signup_nickname', result.nickname);
           navigate('/signup/complete');
         }
         return;
