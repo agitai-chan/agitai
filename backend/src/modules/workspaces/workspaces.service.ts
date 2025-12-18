@@ -255,15 +255,18 @@ export class WorkspacesService {
   private toWorkspaceResponse(workspace: any, role: string): WorkspaceResponseDto {
     return {
       workspace_id: workspace.id,
-      name: workspace.name,
+      workspace_name: workspace.name,
       description: workspace.description,
+      workspace_color: workspace.color || null,
       logo_image: workspace.logoImage,
       owner: {
         user_id: workspace.owner.id,
         nick_name: workspace.owner.nickName,
       },
       member_count: workspace._count?.members || 0,
-      my_role: role,
+      course_count: workspace._count?.courses || 0,
+      user_role: role,
+      is_starred: workspace.isStarred || false,
       created_at: workspace.createdAt,
       updated_at: workspace.updatedAt,
     };

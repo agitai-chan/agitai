@@ -48,10 +48,13 @@ export class WorkspaceResponseDto {
   workspace_id: string;
 
   @ApiProperty()
-  name: string;
+  workspace_name: string;
 
   @ApiPropertyOptional()
   description?: string;
+
+  @ApiPropertyOptional()
+  workspace_color?: string;
 
   @ApiPropertyOptional({ format: 'uri' })
   logo_image?: string;
@@ -65,8 +68,14 @@ export class WorkspaceResponseDto {
   @ApiProperty()
   member_count: number;
 
+  @ApiProperty({ default: 0 })
+  course_count: number;
+
   @ApiProperty()
-  my_role: string;
+  user_role: string;
+
+  @ApiProperty({ default: false })
+  is_starred: boolean;
 
   @ApiProperty({ format: 'date-time' })
   created_at: Date;

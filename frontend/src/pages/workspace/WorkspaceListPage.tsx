@@ -43,7 +43,7 @@ export function WorkspaceListPage() {
     },
   });
 
-  const workspaces = data?.workspaces || [];
+  const workspaces = data || [];
   const filteredWorkspaces = workspaces.filter((w) =>
     w.workspace_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
