@@ -1,4 +1,5 @@
 import { apiClient, apiClientMultipart } from '../axios';
+import { createFormData } from '@/utils/fileUpload';
 import type {
   Task,
   TaskListResponse,
@@ -188,20 +189,12 @@ export const updateGuide = async (
   taskId: string,
   data: UpdateGuideRequest
 ): Promise<Guide> => {
-  const formData = new FormData();
-  
-  formData.append('guide_content', data.guide_content);
-  
-  if (data.attachments) {
-    data.attachments.forEach((file) => {
-      formData.append('attachments', file);
-    });
-  }
-  
-  if (data.remove_attachment_ids) {
-    formData.append('remove_attachment_ids', JSON.stringify(data.remove_attachment_ids));
-  }
-  
+  const formData = createFormData({
+    guide_content: data.guide_content,
+    attachments: data.attachments,
+    remove_attachment_ids: data.remove_attachment_ids,
+  });
+
   const response = await apiClientMultipart.put<Guide>(
     `/task/${taskId}/guide/edit`,
     formData

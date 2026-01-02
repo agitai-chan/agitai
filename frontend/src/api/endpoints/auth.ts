@@ -1,4 +1,5 @@
 import { apiClient, apiClientMultipart } from '../axios';
+import { createFormData } from '@/utils/fileUpload';
 import type {
   SignupRequest,
   SignupResponse,
@@ -87,12 +88,12 @@ export const getProfile = async (): Promise<UserProfile> => {
  * PUT /user/profile
  */
 export const updateProfile = async (data: UpdateProfileRequest): Promise<UserProfile> => {
-  const formData = new FormData();
-  
-  if (data.nick_name) formData.append('nick_name', data.nick_name);
-  if (data.bio) formData.append('bio', data.bio);
-  if (data.profile_image) formData.append('profile_image', data.profile_image);
-  
+  const formData = createFormData({
+    nick_name: data.nick_name,
+    bio: data.bio,
+    profile_image: data.profile_image,
+  });
+
   const response = await apiClientMultipart.put<UserProfile>('/user/profile', formData);
   return response.data;
 };
