@@ -1,10 +1,18 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { FilesService } from '../files/files.service';
 import { UpdateProfileDto, UserProfileResponseDto } from './dto/users.dto';
+
+// 프로필 이미지 업로드 버킷 및 폴더 상수
+const PROFILE_IMAGE_BUCKET = 'uploads';
+const PROFILE_IMAGE_FOLDER = 'profiles';
 
 @Injectable()
 export class UsersService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private filesService: FilesService,
+  ) {}
 
   async getProfile(userId: string): Promise<UserProfileResponseDto> {
     const user = await this.prismaService.user.findUnique({
@@ -54,7 +62,16 @@ export class UsersService {
       }
     }
 
-    // TODO: Handle profile image upload to Supabase Storage
+    // 프로필 이미지 업로드 처리
+    let profileImageUrl: string | undefined;
+    if (profileImage) {
+      const uploadResult = await this.filesService.uploadFile(
+        PROFILE_IMAGE_BUCKET,
+        profileImage,
+        PROFILE_IMAGE_FOLDER,
+      );
+      profileImageUrl = uploadResult.url;
+    }
 
     const updatedUser = await this.prismaService.user.update({
       where: { id: userId },
@@ -62,7 +79,7 @@ export class UsersService {
         realName: dto.real_name,
         nickName: dto.nick_name,
         phoneNumber: dto.phone_number,
-        // profileImage: uploaded image URL
+        ...(profileImageUrl && { profileImage: profileImageUrl }),
       },
     });
 

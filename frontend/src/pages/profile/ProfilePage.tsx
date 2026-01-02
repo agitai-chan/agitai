@@ -1,12 +1,12 @@
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Camera, Save, LogOut } from 'lucide-react';
 import { Button, Input, Card } from '@/components/ui';
 import { updateProfile } from '@/api/endpoints/auth';
 import { useAuthStore } from '@/stores';
+import { useFileUpload } from '@/hooks';
 import toast from 'react-hot-toast';
 
 const profileSchema = z.object({
@@ -18,8 +18,17 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 
 export function ProfilePage() {
   const { user, logout, setUser } = useAuthStore();
-  const queryClient = useQueryClient();
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  // 파일 업로드 훅 사용
+  const {
+    file: profileImage,
+    preview: imagePreview,
+    error: imageError,
+    handleFileSelect,
+  } = useFileUpload({
+    imageOnly: true,
+    onError: (error) => toast.error(error.message),
+  });
 
   const {
     register,
@@ -34,7 +43,11 @@ export function ProfilePage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: updateProfile,
+    mutationFn: (data: ProfileFormData) =>
+      updateProfile({
+        ...data,
+        profile_image: profileImage || undefined,
+      }),
     onSuccess: (data) => {
       setUser({ ...user!, ...data });
       toast.success('프로필이 업데이트되었습니다.');
@@ -44,23 +57,15 @@ export function ProfilePage() {
     },
   });
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleLogout = () => {
     if (confirm('정말 로그아웃 하시겠습니까?')) {
       logout();
       toast.success('로그아웃되었습니다.');
     }
   };
+
+  // 폼 변경 또는 이미지 선택 시 저장 버튼 활성화
+  const hasChanges = isDirty || profileImage !== null;
 
   return (
     <div className="animate-fade-in p-6">
@@ -96,13 +101,16 @@ export function ProfilePage() {
                       type="file"
                       accept="image/*"
                       className="hidden"
-                      onChange={handleImageChange}
+                      onChange={handleFileSelect}
                     />
                   </label>
                 </div>
                 <div>
                   <p className="font-medium text-slate-900">{user?.nick_name}</p>
                   <p className="text-sm text-slate-500">{user?.email}</p>
+                  {imageError && (
+                    <p className="mt-1 text-sm text-red-600">{imageError.message}</p>
+                  )}
                 </div>
               </div>
 
@@ -122,7 +130,7 @@ export function ProfilePage() {
               />
 
               <div className="flex justify-end pt-4">
-                <Button type="submit" disabled={!isDirty} isLoading={updateMutation.isPending}>
+                <Button type="submit" disabled={!hasChanges} isLoading={updateMutation.isPending}>
                   <Save className="mr-2 h-4 w-4" />
                   저장
                 </Button>

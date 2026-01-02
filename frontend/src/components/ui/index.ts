@@ -10,3 +10,9 @@ export {
   CardContent,
   CardFooter,
 } from './Card';
+export {
+  FileUpload,
+  MultiFileUpload,
+  type FileUploadProps,
+  type MultiFileUploadProps,
+} from './FileUpload';
